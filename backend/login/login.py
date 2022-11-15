@@ -10,9 +10,10 @@ from database import engine, SessionLocal
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from sqlalchemy.orm import Session
 
-
+# Set router
 router = APIRouter()
 
+# Google Auth Config
 config = Config('/home/verg9730/map-project/backend/login/.env')
 oauth = OAuth(config)
 
@@ -25,6 +26,7 @@ oauth.register(
     }
 )
 
+# Connect this file & DB
 def get_db():
     try:
         db = SessionLocal()
@@ -48,7 +50,7 @@ async def homepage(request: Request, db:Session=Depends(get_db)):
         db.commit()
         db.refresh(new_user)
 
-        return HTMLResponse(html)
+        return user
     return HTMLResponse('<a href="/login/google">login</a>')
 
 
@@ -70,8 +72,13 @@ async def email(request: Request):
 
 @router.get('/login/google', tags=['login'])
 async def login_via_google(request: Request):
-    redirect_uri = 'http://34.125.39.187.nip.io:8000/auth/google'
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    user = request.session.get('user')
+    if user:
+        data = json.dumps(user)
+        return user
+    else :
+        redirect_uri = 'http://34.125.39.187.nip.io:8000/auth/google'
+        return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get('/auth/google', tags=['login'])
@@ -88,5 +95,5 @@ async def auth_via_google(request: Request):
 
 @router.get('/logout',tags=['login'])
 async def logout(request: Request):
-    request.session.pop('user', None)   
+    request.session.pop('user', None)
     return RedirectResponse(url='/login')

@@ -11,6 +11,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_name = Column(String(32))
     user_email = Column(String(32))
+
+    memos = relationship("Memo", back_populates="writer")
     # created_at = Column(DateTime, default=datetime.datetime.utcnow)       
 
 class Point(Base):
@@ -18,18 +20,25 @@ class Point(Base):
     __tablename__ = 'point'
 
     id = Column(Integer, primary_key=True, index=True)
-    point_coordinate = List[Integer]
+    point_x = Column(Integer)
+    point_y = Column(Integer)
     point_range = Column(Integer)
     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
+    memos = relationship("Memo", back_populates="postbox")
+
 
 class Memo(Base):
     
     __tablename__ = 'memo'
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer)
-    point_id = Column(Integer)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    point_id = Column(Integer, ForeignKey("point.id"))
     memo_type = Column(String(32))
-    point_coordinate = Column(Integer)
+    memo_x = Column(Integer)
+    memo_y = Column(Integer)
     memo_content = Column(String(32))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)       
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    writer = relationship("User", back_populates="memos")
+    postbox = relationship("Point", back_populates="memos")

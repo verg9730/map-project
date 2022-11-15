@@ -28,7 +28,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 models.Base.metadata.create_all(bind=engine)
 
 @app.get("/")
@@ -47,6 +46,9 @@ def get_db():
 async def get_user(db:Session=Depends(get_db)):
     return db.query(models.User).all()
 
+@app.get("/getusermemo")
+async def get_user_memo(db:Session=Depends(get_db)):
+    return db.query(models.User.memos).all()
 
 if __name__ == "__main__":
     import uvicorn
