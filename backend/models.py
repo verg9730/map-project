@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String
 from database import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Table, DateTime
 from sqlalchemy.orm import relationship
 from typing import List
 import datetime
@@ -20,12 +20,20 @@ class Point(Base):
     __tablename__ = 'point'
 
     id = Column(Integer, primary_key=True, index=True)
-    point_x = Column(Integer)
-    point_y = Column(Integer)
-    point_range = Column(Integer)
+    postal_code = Column(Integer)
     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
     memos = relationship("Memo", back_populates="postbox")
 
+# class Point(Base):
+    
+#     __tablename__ = 'point'
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     point_x = Column(Float(32))
+#     point_y = Column(Float(32))
+#     point_range = Column(Integer)
+#     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
+#     memos = relationship("Memo", back_populates="postbox")
 
 class Memo(Base):
     
@@ -35,8 +43,8 @@ class Memo(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     point_id = Column(Integer, ForeignKey("point.id"))
     memo_type = Column(String(32))
-    memo_x = Column(Integer)
-    memo_y = Column(Integer)
+    memo_x = Column(Float(32))
+    memo_y = Column(Float(32))
     memo_content = Column(String(32))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

@@ -8,8 +8,8 @@ class Memo(BaseModel):
     user_id : int
     point_id : int
     memo_type : str
-    memo_x : int
-    memo_y : int
+    memo_x : float
+    memo_y : float
     memo_content : str
     created_at : datetime.datetime    
     class Config:
@@ -27,12 +27,20 @@ class User(BaseModel):
 
 class Point(BaseModel):
 
-    point_x : int
-    point_y : int
-    point_range : int
+    postal_code : int
 
     memos : List[Memo] = []
     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
     class Config:
         orm_mode = True
         
+# class Point(BaseModel):
+
+#     point_x : float
+#     point_y : float
+#     point_range : int
+
+#     memos : List[Memo] = []
+#     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
+#     class Config:
+#         orm_mode = True
