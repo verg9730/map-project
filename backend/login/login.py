@@ -2,6 +2,7 @@ import json
 import models
 from fastapi import APIRouter
 from fastapi import FastAPI, Depends
+from pydantic import BaseModel
 from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
@@ -14,10 +15,10 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 # Google Auth Config
-config = Config('/home/verg9730/map-project/backend/login/.env')
-oauth = OAuth(config)
+# config = Config('/home/verg9730/map-project/backend/login/.env')
+# oauth = OAuth(config)
 
-CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+# CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth.register(
     name='google',
     server_metadata_url=CONF_URL,
@@ -40,16 +41,14 @@ async def homepage(request: Request, db:Session=Depends(get_db)):
     user = request.session.get('user')
     if user:
         data = json.dumps(user)
-        html = (
-            f'<pre>{data}</pre>'
-            '<a href="/logout">logout</a>'
-        )
-
-        new_user = models.User(user_name=user['name'],user_email=user['email'])
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-
+        existing_user = db.query(models.User).filter(models.User.user_name == user['name']).filter(models.User.user_email == user['email']).first()
+        if existing_user:
+            print("user already login")
+        else:
+            new_user = models.User(user_name=user['name'],user_email=user['email'])
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
         return user
     return HTMLResponse('<a href="/login/google">login</a>')
 
@@ -70,12 +69,12 @@ async def email(request: Request):
         return email
 
 
+'''
 @router.get('/login/google', tags=['login'])
-async def login_via_google(request: Request):
+async def login_via_google( ,request: Request):
     user = request.session.get('user')
     if user:
-        data = json.dumps(user)
-        return user
+        return 'You are already logged in!'
     else :
         redirect_uri = 'http://34.125.39.187.nip.io:8000/auth/google'
         return await oauth.google.authorize_redirect(request, redirect_uri)
@@ -97,3 +96,4 @@ async def auth_via_google(request: Request):
 async def logout(request: Request):
     request.session.pop('user', None)
     return RedirectResponse(url='/login')
+'''
