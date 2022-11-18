@@ -1,5 +1,4 @@
-from ssl import create_default_context
-from typing import Union, List
+from typing import List
 import datetime
 from pydantic import BaseModel
 
@@ -7,7 +6,7 @@ class Memo(BaseModel):
 
     user_id : int
     point_id : int
-    memo_type : str
+    memo_type : int
     memo_x : float
     memo_y : float
     memo_content : str
@@ -23,24 +22,12 @@ class User(BaseModel):
     memos : List[Memo] = []
     class Config:
         orm_mode = True
-    # created_at = Column(DateTime, default=datetime.datetime.utcnow)       
 
 class Point(BaseModel):
 
-    postal_code : int
+    postal_code : str
 
     memos : List[Memo] = []
-    # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
     class Config:
         orm_mode = True
         
-# class Point(BaseModel):
-
-#     point_x : float
-#     point_y : float
-#     point_range : int
-
-#     memos : List[Memo] = []
-#     # created_at = Column(DateTime, default=datetime.datetime.utcnow)     
-#     class Config:
-#         orm_mode = True

@@ -110,7 +110,9 @@ async def get_postal_code(request:Coordinate, db:Session=Depends(get_db)):
  
     coordinate = f"{point_x}, {point_y}"
     postal_code = geocoding_reverse(coordinate)[0].split(',')[-2].strip()
-    if not db.query(models.Point).filter(postal_code==postal_code).first():
+    if db.query(models.Point).filter(models.Point.postal_code==postal_code).first():
+        print("existing postal code")
+    else:
         new_point = models.Point(postal_code=postal_code)
         db.add(new_point)
         db.commit()
@@ -121,13 +123,13 @@ async def get_postal_code(request:Coordinate, db:Session=Depends(get_db)):
 async def get_all_memos(db:Session=Depends(get_db)):
     return db.query(models.Memo).all()
 
-@app.get("/memos/private/{user_id}")
+@app.get("/memos/private/{user_id}") #0:public 1:private
 async def get_private_memo(db:Session=Depends(get_db)):
-    return db.query(models.Memo).filter(models.Memo.memo_type == "private").filter(models.Memo.user_id==user_id).all()
+    return db.query(models.Memo).filter(models.Memo.memo_type == 1).filter(models.Memo.user_id==user_id).all()
 
-@app.get("/memos/public/{point_id}")
+@app.get("/memos/public/{point_id}") #0:public 1:private
 async def get_public_memo(point_id:int, db:Session=Depends(get_db)):
-    return db.query(models.Memo).filter(models.Memo.memo_type == "public").filter(models.Memo.point_id==point_id).all()
+    return db.query(models.Memo).filter(models.Memo.memo_type == 0).filter(models.Memo.point_id==point_id).all()
     
 @app.post("/memos/create")
 async def create_memo(request:schemas.Memo, db:Session=Depends(get_db)):
